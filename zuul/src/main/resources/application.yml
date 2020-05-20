@@ -1,0 +1,30 @@
+server:
+  port: 8888
+
+nacos:
+  address: 127.0.0.1:8848
+  config:
+    dataId: zuul-server
+    group: zuul_route
+
+spring:
+  cloud:
+    nacos:
+      discovery:
+        server-addr: ${nacos.address}
+  application:
+    name: zuul-server
+
+
+zuul:
+  ignored-services: nacos-payment-provider,nacos-order-consumer  #外部通过微服务应用不可以访问
+  #  prefix: /myzuul                             //添加前缀
+  routes:
+    consumer:    #可以随便写，在zuul上面唯一即可；当这里的值=service-id时，service-id可以不写。
+      enable: true
+      id: nacos-order-consumer
+      serviceId: nacos-order-consumer #如果是/consumer/**路径下的请求，则跳转到 nacos-order-consumer
+      path: /consumer/**
+      retryable: false
+      stripPrefix: true
+      url: nacos-order-consumer
